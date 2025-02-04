@@ -1,15 +1,22 @@
 import json
+import requests
 
-def load_data(file_path):
-  """ Loads a JSON file """
-  with open(file_path, "r") as handle:
-    return json.load(handle)
 
-animals_data = load_data("animals_data.json")
+input_animal_name = input("Enter name of an animal: ")
+api_url = 'https://api.api-ninjas.com/v1/animals?name={}'.format(input_animal_name)
+response = requests.get(api_url, headers={'X-Api-Key': 'SKDWNkk5OmzCCjkkIk9qNw==kHPaSVtQHBC8o5RO'})
+
 
 def get_animal_name():
     output = ""
-    for i in animals_data:
+    if response.json() == []:
+        html_file = str(read_html("animals_template.html"))
+        new_html = html_file.replace("My Animal Repository",
+                                     f"The animal {input_animal_name} doesn't exist")
+        with open("animals.html", "w") as f:
+            f.write(new_html)
+        return new_html
+    for i in response.json():
         skip_type = i.get("characteristics", {}).get("type", "Unknown")
         if skip_type == "Unknown":
             output += "<li class='cards__item'>\n"
@@ -33,7 +40,6 @@ def get_animal_name():
     return output
 
 
-
 def read_html(file_path):
     with open(file_path, "r") as f:
         file_str = f.read()
@@ -41,10 +47,11 @@ def read_html(file_path):
 
 
 html_file = str(read_html("animals_template.html"))
-animals_str = str(get_animal_name())
+animals_str = get_animal_name()
 
 new_html = html_file.replace("__REPLACE_ANIMALS_INFO__", animals_str)
 
 with open("animals.html", "w") as f:
     f.write(new_html)
 
+print("Website was successfully generated to the file animals.html.")
