@@ -1,22 +1,19 @@
-import json
-import requests
-
+import data_fetcher
 
 input_animal_name = input("Enter name of an animal: ")
-api_url = 'https://api.api-ninjas.com/v1/animals?name={}'.format(input_animal_name)
-response = requests.get(api_url, headers={'X-Api-Key': 'SKDWNkk5OmzCCjkkIk9qNw==kHPaSVtQHBC8o5RO'})
+data = data_fetcher.fetch_data(input_animal_name)
 
 
 def get_animal_name():
     output = ""
-    if response.json() == []:
+    if data.json() == []:
         html_file = str(read_html("animals_template.html"))
         new_html = html_file.replace("My Animal Repository",
                                      f"The animal {input_animal_name} doesn't exist")
         with open("animals.html", "w") as f:
             f.write(new_html)
         return new_html
-    for i in response.json():
+    for i in data.json():
         skip_type = i.get("characteristics", {}).get("type", "Unknown")
         if skip_type == "Unknown":
             output += "<li class='cards__item'>\n"
